@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="{% static 'main/images/icon.ico' %}">
+  <title>Kwanthanze - Student Portal</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+  <style>
+    /* Custom styles for centering the form */
+    .card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+    }
+  </style>
+</head>
+<body>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header text-center">
+            <img src="{% static 'main/images/logo2.png' %}" alt="Logo" width="150">
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.id_number.id_for_label }}">Admin/Student ID Number</label>
+                    {{ form.id_number }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">Password</label>
+                    {{ form.password }}
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success mt-0">Login</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+    
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
