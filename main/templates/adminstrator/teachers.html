@@ -1,0 +1,43 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+   
+  {% if teachers %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Classes Teaching</th>
+        <th>Subjects Teaching</th>
+        <!-- Add more columns as needed -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for teacher in teachers %}
+        <tr>
+          <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
+          <td>
+            {% for class_taught in teacher.classes_taught.all %}
+              {{ class_taught.name }}
+              {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            {% for subject_taught in teacher.subjects_taught.all %}
+              {{ subject_taught.name }}
+              {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <!-- Add more columns as needed -->
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No teachers found.</p>
+  {% endif %}
+
+</div>
+{% endblock content %}

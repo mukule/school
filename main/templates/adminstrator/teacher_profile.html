@@ -1,0 +1,24 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>Email: {{ user.email }}</p>
+        {% if teacher %}
+          <!-- Display teacher details if profile exists -->
+          <p>Subjects: {{ teacher.subjects.all|join:", " }}</p>
+          <p>Phone Number: {{ teacher.phone_number }}</p>
+          
+          <!-- Additional teacher details -->
+          
+        {% else %}
+          <!-- Display a message or button to complete the teacher profile -->
+          <p>Please complete your teacher profile.</p>
+          <a href="{% url 'users:create_teacher' %}">Create Teacher Profile</a>
+      
+        {% endif %}
+      </div>
+</div>
+{% endblock content %}

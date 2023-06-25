@@ -1,0 +1,119 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <!-- Additional fields for creating teacher profile -->
+           <div class="form-row">
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.first_name.id_for_label }}">ID No.</label>
+                {{ form.national_id }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                {{ form.first_name }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                {{ form.last_name }}
+            </div>
+           </div>
+           <div class="form-row">
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                {{ form.phone_number }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.address.id_for_label }}">Address</label>
+                {{ form.address }}
+            </div>
+           </div>
+           <div class="form-row">
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                {{ form.date_of_birth }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.nationality.id_for_label }}">Nationality</label>
+                {{ form.nationality }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.gender.id_for_label }}">Gender</label>
+                {{ form.gender }}
+            </div>
+           </div>
+           <div class="form-row">
+            <div class="form-group col-md-6 mb-0">
+                <label for="{{ form.subjects_taught.id_for_label }}">Subjects Teaching</label>
+                {{ form.subjects_taught }}
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <label for="{{ form.classes_taught.id_for_label }}">Classes Teaching</label>
+                {{ form.classes_taught }}
+            </div>
+           </div>
+           <div class="form-row">
+            <div class="form-group col-md-6 mb-0">
+                <label for="{{ form.qualifications.id_for_label }}">Qualifications</label>
+                {{ form.qualifications }}
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                <label for="{{ form.interests.id_for_label }}">Interests</label>
+                {{ form.interests }}
+            </div>
+           </div>
+            <div class="form-row">
+                <div class="form-group col-md-4 mb-0">
+                    <label for="{{ form.start_date.id_for_label }}">Start Date</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    <label for="{{ form.employment_status.id_for_label }}">Employment Status</label>
+                    {{ form.employment_status }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    <label for="{{ form.experience.id_for_label }}">Experience</label>
+                    {{ form.experience }}
+                </div>      
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6 mb-0">
+                    <label for="{{ form.notes.id_for_label }}">Notes</label>
+                    {{ form.notes }}
+                </div>
+                <div class="form-group col-md-6 mb-0">
+                    <label for="{{ form.curriculum_activities.id_for_label }}">Curriculum Activities</label>
+                    {{ form.curriculum_activities }}
+                </div>
+            </div>       
+           <div class="form-row">
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.emergency_contact_name.id_for_label }}">Emergency Contact Name</label>
+                {{ form.emergency_contact_name }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.emergency_contact_number.id_for_label }}">Emergency Contact Number</label>
+                {{ form.emergency_contact_number }}
+            </div>
+            <div class="form-group col-md-4 mb-3">
+                <label for="{{ form.photo.id_for_label }}">Photo</label>
+                {{ form.photo }}
+            </div>
+            
+           </div>
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-success mt-0">Create Teacher</button>
+            </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}

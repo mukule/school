@@ -12,6 +12,7 @@ admin.site.index_title = 'Student Management admin Portal'
 
 urlpatterns = [
     path("", include('users.urls', namespace='users')),
+    path("main/", include('main.urls', namespace='main')),
     path('admin/', admin.site.urls),
     
 ]
