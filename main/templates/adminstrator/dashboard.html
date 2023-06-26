@@ -4,31 +4,37 @@
 {% block content %}
 
 <div class="container">
-  <div class="row justify-content-center align-items-center">
+  <div class="row justify-content-center align-items-center mt-5">
     <div class="col-lg-8 col-md-8 col-sm-12 card-container">
-      <div class="card main-card">
+      <div class="card main-card border-0">
         <div class="card-body">
           <div class="card-content">
             <div class="row">
-              <div class="col col-md-4" >
-                <div class="card">cards 1</div>
+              <div class="col col-md-4">
+                <a href="{% url 'users:create_teacher' %}">
+                  <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">Add Teacher</div>
+                </a>
               </div>
-              <div class="col col-md-4" >
-                <div class="card">cards 2</div>
+              <div class="col col-md-4">
+               <a href="{% url 'users:register' %}">
+                <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">Add Student</div>
+               </a>
               </div>
-              <div class="col col-md-4" >
-                <div class="card">cards 3</div>
+              <div class="col col-md-4">
+               <a href="{% url 'users:create_parent' %}">
+                <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">Create Parent</div>
+               </a>
               </div>
             </div>
             <div class="row mt-4">
-              <div class="col col-md-4" >
-                <div class="card">cards 4</div>
+              <div class="col col-md-4">
+                <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">cards 4</div>
               </div>
-              <div class="col col-md-4" >
-                <div class="card">cards 5</div>
+              <div class="col col-md-4">
+                <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">cards 5</div>
               </div>
-              <div class="col col-md-4" >
-                <div class="card">cards 6</div>
+              <div class="col col-md-4">
+                <div class="card shadow-sm border-0 square-card d-flex align-items-center justify-content-center">cards 6</div>
               </div>
             </div>
           </div>

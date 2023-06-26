@@ -9,8 +9,6 @@ from django.forms import ModelForm, DateInput
 from .models import *
 
 
-
-
 class UserRegisterForm(UserCreationForm):
     USER_TYPES = (
         ('admin', 'Admin'),
@@ -20,11 +18,6 @@ class UserRegisterForm(UserCreationForm):
     username = forms.CharField(
         max_length=30,
         widget=forms.TextInput(attrs={'placeholder': 'ID NUMBER', 'class': 'form-control'}),
-        label='',
-    )
-    email = forms.EmailField(
-        max_length=254,
-        widget=forms.EmailInput(attrs={'placeholder': 'Email', 'class': 'form-control'}),
         label='',
     )
     first_name = forms.CharField(
@@ -51,33 +44,9 @@ class UserRegisterForm(UserCreationForm):
         label='User Type',
     )
     date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={'placeholder': 'Date of Birth', 'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'placeholder': 'Date of Birth', 'class': 'form-control', 'type': 'date'}),
         label='',
-        required=False,
-    )
-    contact_number = forms.CharField(
-        max_length=20,
-        widget=forms.TextInput(attrs={'placeholder': 'Contact Number', 'class': 'form-control'}),
-        label='',
-        required=False,
-    )
-    address = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'placeholder': 'Address', 'class': 'form-control'}),
-        label='',
-        required=False,
-    )
-    parent_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'placeholder': 'Parent Name', 'class': 'form-control'}),
-        label='',
-        required=False,
-    )
-    parent_contact = forms.CharField(
-        max_length=20,
-        widget=forms.TextInput(attrs={'placeholder': 'Parent Contact', 'class': 'form-control'}),
-        label='',
-        required=False,
+        required=False
     )
     class_admitted = forms.ModelChoiceField(
         queryset=ClassName.objects.all(),
@@ -85,10 +54,10 @@ class UserRegisterForm(UserCreationForm):
         label='Class Admitted',
         required=False,
     )
-    current_class = forms.ModelChoiceField(
-        queryset=ClassName.objects.all(),
+    stream = forms.ModelChoiceField(
+        queryset=Stream.objects.none(),
         widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Current Class',
+        label='Stream',
         required=False,
     )
     entry_marks = forms.FloatField(
@@ -97,7 +66,7 @@ class UserRegisterForm(UserCreationForm):
         required=False,
     )
     date_of_admission = forms.DateField(
-        widget=forms.DateInput(attrs={'placeholder': 'Date of Admission', 'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'placeholder': 'Date of Admission', 'class': 'form-control', 'type': 'date'}),
         label='',
         required=False,
     )
@@ -107,36 +76,28 @@ class UserRegisterForm(UserCreationForm):
         label='',
         required=False,
     )
-    subjects = forms.ModelMultipleChoiceField(
-        queryset=Subject.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        label='Subjects',
-        required=False,
-    )
-    curriculum_activity = forms.ModelChoiceField(
-        queryset=CurriculumActivity.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Curriculum Activity',
-        required=False,
-    )
-    leadership = forms.ModelChoiceField(
-        queryset=Leadership.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Leadership',
-        required=False,
-    )
 
     class Meta:
         model = get_user_model()
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'user_type', 'date_of_birth', 'contact_number', 'address', 'parent_name', 'parent_contact', 'class_admitted', 'current_class', 'entry_marks', 'date_of_admission', 'house', 'subjects', 'curriculum_activity', 'leadership']
+        fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'user_type', 'date_of_birth', 'class_admitted', 'stream', 'entry_marks', 'date_of_admission', 'house']
+
+    def __init__(self, *args, **kwargs):
+        super(UserRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['stream'].queryset = Stream.objects.none()
+
+        if 'class_admitted' in self.data:
+            class_admitted_id = self.data.get('class_admitted')
+            if class_admitted_id:
+                class_admitted = ClassName.objects.get(id=class_admitted_id)
+                self.fields['stream'].queryset = class_admitted.streams.all()
 
     def save(self, commit=True):
         user = super(UserRegisterForm, self).save(commit=False)
-        user.email = self.cleaned_data['email']
         user.user_type = self.cleaned_data['user_type']
         if commit:
             user.save()
         return user
+
     
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -268,3 +229,26 @@ class TeacherCreationForm(forms.ModelForm):
 
         self.save_m2m()
         return teacher
+    
+class ParentCreationForm(forms.ModelForm):
+    student = forms.ModelChoiceField(queryset=CustomUser.objects.filter(user_type='student'),
+                                     empty_label='Select a Student',
+                                     widget=forms.Select(attrs={'class': 'form-control'}))
+    alternative_phone_number = forms.CharField(max_length=20, required=False,
+                                               widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Alternative Phone Number'}))
+
+    class Meta:
+        model = Parent
+        fields = ['student', 'name', 'phone_number', 'alternative_phone_number', 'email', 'address']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Parent Name'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Address'}),
+        }
+
+    def save(self, commit=True):
+        parent = super().save(commit=False)
+        if commit:
+            parent.save()
+        return parent

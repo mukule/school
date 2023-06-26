@@ -1,0 +1,14 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <nav class="navbar nav">
+            {% for class in classes %}
+            <a class="nav-link" href="">{{ class.name }}</a>
+            {% endfor %}
+        </nav>
+    </div>
+</div>
+{% endblock %}

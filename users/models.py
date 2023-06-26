@@ -9,23 +9,36 @@ class CustomUser(AbstractUser):
     )
 
     user_type = models.CharField(max_length=10, choices=USER_TYPES)
-    email = models.EmailField(unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    contact_number = models.CharField(max_length=20, null=True, blank=True)
-    address = models.CharField(max_length=100, null=True, blank=True)
-    parent_name = models.CharField(max_length=100, null=True, blank=True)
-    parent_contact = models.CharField(max_length=20, null=True, blank=True)
     class_admitted = models.ForeignKey('ClassName', on_delete=models.CASCADE, related_name='admitted_students', null=True, blank=True)
-    current_class = models.ForeignKey('ClassName', on_delete=models.CASCADE, related_name='current_students', null=True, blank=True)
     entry_marks = models.FloatField(null=True, blank=True)
     date_of_admission = models.DateField(null=True, blank=True)
     house = models.CharField(max_length=50, null=True, blank=True)
-    subjects = models.ManyToManyField('Subject', related_name='students', null=True, blank=True)
-    curriculum_activity = models.ForeignKey('CurriculumActivity', on_delete=models.SET_NULL, null=True, blank=True)
-    leadership = models.ForeignKey('Leadership', on_delete=models.SET_NULL, null=True, blank=True)
+    stream = models.ForeignKey('Stream', on_delete=models.SET_NULL, related_name='students', null=True, blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+
+
+class ClassName(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Parent(models.Model):
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='parents', null=True, blank=True)
+    name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20)
+    alternative_phone_number = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField()
+    address = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 
 class Teacher(models.Model):
     GENDER_CHOICES = [
@@ -57,13 +70,21 @@ class Teacher(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-
-
-class ClassName(models.Model):
+    
+class Stream(models.Model):
     name = models.CharField(max_length=255)
+    class_name = models.ForeignKey(ClassName, on_delete=models.CASCADE, related_name='streams', null=True, blank=True)
+    class_teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, related_name='stream_class_teacher',
+                                      null=True, blank=True)
+    prefect = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, related_name='stream_prefect',
+                                null=True, blank=True)
+    parent_representative = models.ForeignKey(Parent, on_delete=models.SET_NULL,
+                                              related_name='stream_parent_representative',
+                                              null=True, blank=True)
 
     def __str__(self):
         return self.name
+
 
 
 class CurriculumActivity(models.Model):

@@ -1,0 +1,33 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Student</th>  <!-- New column for student -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for parent in parents %}
+            <tr>
+                <td>{{ parent.name }}</td>
+                <td>{{ parent.phone_number }}</td>
+                <td>{{ parent.email }}</td>
+                <td>{{ parent.address }}</td>
+                <td>{{ parent.student.first_name }} {{ parent.student.last_name }}</td>  <!-- Display student's name -->
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No parents available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

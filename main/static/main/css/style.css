@@ -36,6 +36,15 @@ a {
   color: #fff;
 }
 
+.square-card {
+  height: 150px; /* Adjust the height as per your preference */
+  width: 150px; /* Adjust the width as per your preference */
+  aspect-ratio: 1/1; /* Ensure the aspect ratio is 1:1 for square cards */
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+
+
 
 
 @media (max-width: 768px) {

@@ -9,7 +9,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from .models import *
 from django.views.generic import *
+from django.http import JsonResponse
 
+
+def get_filtered_streams(request):
+    class_id = request.GET.get('class_id')
+    streams = Stream.objects.filter(class_name_id=class_id).values('id', 'name')
+    return JsonResponse({'streams': list(streams)})
 
 @user_passes_test(lambda u: u.user_type == 'admin', login_url='users:login')
 def register(request):
@@ -18,11 +24,16 @@ def register(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            return redirect('users:login')
+            messages.success(request, f'User {username} has been created successfully.')
+            return redirect('main:dashboard_admin')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field.capitalize()}: {error}')
     else:
         form = UserRegisterForm()
 
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'adminstrator/create_student.html', {'form': form})
 
 def custom_login(request):
     if request.method == "POST":
@@ -80,3 +91,28 @@ def student(request):
     students = User.objects.filter(user_type='student')
 
     return render(request, 'adminstrator/student.html', {'students': students})
+
+def create_parent(request):
+    if request.method == 'POST':
+        form = ParentCreationForm(request.POST)
+        if form.is_valid():
+            parent = form.save(commit=False)
+            parent.user = request.user  # Assign the current user as the parent's user
+            parent.save()
+            form.save_m2m()  # Save the many-to-many relationships, if any
+            messages.success(request, 'Parent created successfully.')
+            return redirect('users:parents')  # Redirect to parent list page
+        else:
+            messages.error(request, 'Error creating parent. Please check the form.')
+    else:
+        form = ParentCreationForm()
+    
+    return render(request, 'adminstrator/create_parent.html', {'form': form})
+
+def parents(request):
+    parents = Parent.objects.all()
+    return render(request, 'adminstrator/parents.html', {'parents': parents})
+
+def classes(request):
+    classes = ClassName.objects.all()
+    return render(request, 'adminstrator/classes.html', {'classes': classes})

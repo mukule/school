@@ -1,0 +1,75 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <!-- Additional fields for creating student profile -->
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.username.id_for_label }}">Student ID Number</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.date_of_admission.id_for_label }}">Date of Admission</label>
+                        {{ form.date_of_admission }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.class_admitted.id_for_label }}">Class admitted</label>
+                        {{ form.class_admitted }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.entry_marks.id_for_label }}">Entry Marks</label>
+                        {{ form.entry_marks }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.house.id_for_label }}">House allocated</label>
+                        {{ form.house }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.stream.id_for_label }}">Stream allocated</label>
+                        {{ form.stream }}
+                    </div>
+                </div>  
+                <div class="form-row">
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.user_type.id_for_label }}">Student category</label>
+                        {{ form.user_type }}
+                    </div>
+                    <div class="form-group col-md-4 mb-4">
+                        <label for="{{ form.password1.id_for_label }}">Enter Default Password</label>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="form-group col-md-4 mb-0">
+                        <label for="{{ form.password2.id_for_label }}">Confirm Default Password</label>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success mt-0">Create Student</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}
