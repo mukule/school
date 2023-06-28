@@ -1,0 +1,41 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center">
+  <h4>{{ exam.name }} Exam Result</h4>
+  {% with stream=students.0.stream %}
+    <h5>{{ stream.class_name.name }} {{ stream.name }}</h5>
+  {% endwith %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Admission Number</th>
+        <th>Entry Marks</th>
+        <th>Subject</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>
+            <a href="{% url 'users:student_result' student.id exam.id %}">
+              {{ student.get_full_name }}
+            </a>
+          </td>
+          
+        <td>{{ student.username }}</td>
+        <td>{{ student.entry_marks }}</td>
+        <td>
+          {% for subject in student.subjects.all %}
+          {{ subject.name }}
+          {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

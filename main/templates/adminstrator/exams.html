@@ -1,0 +1,37 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center">
+   <div class="card text-center border-0 shadow-sm">
+    <div class="card-header">
+        <a href="{% url 'users:create_exam' %}">schedule exam</a>
+    </div>
+    <div class="card-body">
+        Exams
+    </div>
+   </div>
+  {% if exams %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exam in exams %}
+          <tr>
+            <td>{{ exam.name }}</td>
+            <td>{{ exam.start_date }}</td>
+            <td>{{ exam.end_date }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No exams available.</p>
+  {% endif %}
+</div>
+{% endblock %}

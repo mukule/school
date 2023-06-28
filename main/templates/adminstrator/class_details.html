@@ -1,0 +1,35 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-9">
+            <h3 class="text-center">{{ class_obj.name }} Details</h3>
+            <h4 class="text-center">Total Students: {{ class_obj.admitted_students.count }}</h4>
+
+            <h4 class="text-center">Streams</h4>
+            <div class="row justify-content-center">
+                {% for stream in class_obj.streams.all %}
+                <div class="col-md-4">
+                    <a href="{% url 'users:stream_detail' stream.id %}">
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-center">
+                                    {{ stream.name }}
+                                </h5>
+                                <p class="card-text text-center">Students: {{ stream.students.count }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col">
+                    <p class="text-center">No streams found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

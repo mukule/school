@@ -1,0 +1,30 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center">
+    <form method="post">
+        {% csrf_token %}
+       <fieldset class="form-group">
+        <div class="form-row">
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.name.id_for_label }}">Exam Name</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.start_date.id_for_label }}">Exam Start Date</label>
+                {{ form.start_date }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                <label for="{{ form.end_date.id_for_label }}">Exam End Date</label>
+                {{ form.end_date }}
+            </div>
+        </div>
+        <div class="form-group text-center mt-5">
+            <button type="submit" class="btn btn-success mt-0">Schedule Exam</button>
+        </div>
+       </fieldset>
+      </form>
+      
+</div>
+{% endblock %}

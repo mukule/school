@@ -2,6 +2,13 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Subject(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUser(AbstractUser):
     USER_TYPES = (
         ('admin', 'Admin'),
@@ -13,16 +20,25 @@ class CustomUser(AbstractUser):
     class_admitted = models.ForeignKey('ClassName', on_delete=models.CASCADE, related_name='admitted_students', null=True, blank=True)
     entry_marks = models.FloatField(null=True, blank=True)
     date_of_admission = models.DateField(null=True, blank=True)
-    house = models.CharField(max_length=50, null=True, blank=True)
+    house = models.ForeignKey('House', on_delete=models.SET_NULL, related_name='students', null=True, blank=True)
     stream = models.ForeignKey('Stream', on_delete=models.SET_NULL, related_name='students', null=True, blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
 
-
 class ClassName(models.Model):
     name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Exam(models.Model):
+    name = models.CharField(max_length=255)
+    classes = models.ManyToManyField(ClassName, related_name='exams', null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -54,8 +70,8 @@ class Teacher(models.Model):
     email = models.EmailField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     address = models.CharField(max_length=100, null=True, blank=True)
-    subjects_taught = models.ManyToManyField('Subject', related_name='teachers', blank=True)
-    classes_taught = models.ManyToManyField('ClassName', related_name='teachers', blank=True)
+    subjects_taught = models.ManyToManyField(Subject, related_name='teachers', blank=True)
+    classes_taught = models.ManyToManyField(ClassName, related_name='teachers', blank=True)
     qualifications = models.TextField(null=True, blank=True)
     experience = models.IntegerField(null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
@@ -70,7 +86,8 @@ class Teacher(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-    
+
+
 class Stream(models.Model):
     name = models.CharField(max_length=255)
     class_name = models.ForeignKey(ClassName, on_delete=models.CASCADE, related_name='streams', null=True, blank=True)
@@ -85,6 +102,15 @@ class Stream(models.Model):
     def __str__(self):
         return self.name
 
+
+class House(models.Model):
+    name = models.CharField(max_length=50)
+    capacity = models.PositiveIntegerField(default=0)
+    prefect = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, related_name='house_prefect',
+                                   null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CurriculumActivity(models.Model):
@@ -101,8 +127,26 @@ class Leadership(models.Model):
         return self.name
 
 
-class Subject(models.Model):
-    name = models.CharField(max_length=255)
+class StudentSubject(models.Model):
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='subjects')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    marks = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return f"{self.student} - {self.subject}: {self.marks}"
+
+
+class Result(models.Model):
+    student_subject = models.ForeignKey(StudentSubject, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    marks = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.student_subject.student} - {self.student_subject.subject}: {self.marks}"
+    
+class Grade(models.Model):
+    grade_name = models.CharField(max_length=10)
+    grade_points = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return self.grade_name

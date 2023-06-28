@@ -54,12 +54,6 @@ class UserRegisterForm(UserCreationForm):
         label='Class Admitted',
         required=False,
     )
-    stream = forms.ModelChoiceField(
-        queryset=Stream.objects.none(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Stream',
-        required=False,
-    )
     entry_marks = forms.FloatField(
         widget=forms.NumberInput(attrs={'placeholder': 'Entry Marks', 'class': 'form-control'}),
         label='',
@@ -70,26 +64,10 @@ class UserRegisterForm(UserCreationForm):
         label='',
         required=False,
     )
-    house = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={'placeholder': 'House', 'class': 'form-control'}),
-        label='',
-        required=False,
-    )
 
     class Meta:
         model = get_user_model()
-        fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'user_type', 'date_of_birth', 'class_admitted', 'stream', 'entry_marks', 'date_of_admission', 'house']
-
-    def __init__(self, *args, **kwargs):
-        super(UserRegisterForm, self).__init__(*args, **kwargs)
-        self.fields['stream'].queryset = Stream.objects.none()
-
-        if 'class_admitted' in self.data:
-            class_admitted_id = self.data.get('class_admitted')
-            if class_admitted_id:
-                class_admitted = ClassName.objects.get(id=class_admitted_id)
-                self.fields['stream'].queryset = class_admitted.streams.all()
+        fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'user_type', 'date_of_birth', 'class_admitted', 'entry_marks']
 
     def save(self, commit=True):
         user = super(UserRegisterForm, self).save(commit=False)
@@ -252,3 +230,39 @@ class ParentCreationForm(forms.ModelForm):
         if commit:
             parent.save()
         return parent
+    
+
+class SubjectSelectionForm(forms.Form):
+    subjects = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        subjects = kwargs.pop('subjects', None)
+        super().__init__(*args, **kwargs)
+        self.fields['subjects'].queryset = subjects
+
+class ExamForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=255,
+        label='Exam Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+    )
+    end_date = forms.DateField(
+        label='End Date',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+    )
+
+    class Meta:
+        model = Exam
+        fields = ['name', 'start_date', 'end_date']
+
+class SubjectMarksForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        subjects = kwargs.pop('subjects')
+        super().__init__(*args, **kwargs)
+        for student_subject in subjects:
+            self.fields[f'marks_{student_subject.id}'] = forms.DecimalField(label=student_subject.subject.name)
+

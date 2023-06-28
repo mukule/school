@@ -3,12 +3,26 @@
 
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <nav class="navbar nav">
-            {% for class in classes %}
-            <a class="nav-link" href="">{{ class.name }}</a>
-            {% endfor %}
-        </nav>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6 col-lg-6">
+            <div class="card mb-3 big-card d-flex justify-content-center align-items-center border-0">
+                <div class="card-body">
+                    <div class="row">
+                        {% for class in classes %}
+                        <div class="col-md-6">
+                            <a href="{% url 'users:class_detail' class_id=class.id %}">
+                                <div class="card mb-3 square-card justify-content-center align-items-center border-0">
+                                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                        <h5 class="card-title">{{ class.name }}</h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -16,7 +16,14 @@ urlpatterns = [
     path('parents', views.parents, name='parents'),
     path('classes/', views.classes, name='classes'),
     path('get_filtered_streams/', get_filtered_streams, name='get_filtered_streams'),
-
+    path('class/<int:class_id>/', views.class_detail, name='class_detail'),
+    path('stream/<int:stream_id>/', views.stream_detail, name='stream_detail'),
+    path('update-subjects/<int:user_id>/', views.update_subjects, name='update_subjects'),
+    path('create-exams/', views.create_exam, name='create_exam'),
+    path('exams/', views.exams, name='exams'),
+    path('exam/<int:exam_id>/stream/<int:stream_id>/result/', views.exam_result, name='exam_result'),
+    path('student/<int:student_id>/exam/<int:exam_id>/result/', views.update_subject_marks, name='student_result'),
+    
      
     # Other URL patterns
 ]

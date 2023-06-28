@@ -1,0 +1,92 @@
+{% extends "adminstrator/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="justify-content-center">
+        <h4 class="text-center">{{ stream.class_name.name }} {{ stream.name }} Details</h4>
+            <h4 class="text-center"> Class teacher {{ stream.class_teacher }}</h4>
+            <h4 class="text-center">Total Students: {{ stream.students.count }}</h4>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <div class="card-header border-0">
+                        <h4>Exam Results</h4>
+                    </div>
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Exam Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for exam in exams %}
+                        <tr>
+                            <td><a href="{% url 'users:exam_result' exam.id stream.id %}">
+                                {{ exam.name }}
+                            </a></td>
+                            <td>{{ exam.start_date }}</td>
+                            <td>{{ exam.end_date }}</td>
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card border-0 shadow-sm text-center">
+            <div class="card-header border-0">
+                <h4>Stream Composition</h4>
+            </div>
+            <div class="card-body">
+                {% if stream.students.exists %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Admission No.</th>
+                                <th>Class Admitted</th>
+                                <th>Date of Admission</th>
+                                <th>Entry Marks</th>
+                                <th>Subjects</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in stream.students.all %}
+                            <tr>
+                                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                <td>{{ student.username }}</td>
+                                <td>{{ student.class_admitted }}</td>
+                                <td>{{ student.date_of_admission }}</td>
+                                <td>{{ student.entry_marks }}</td>
+                                <td>
+                                    {% if student.subjects.exists %}
+                                        {% for student_subject in student.subjects.all %}
+                                            {{ student_subject.subject.name }}
+                                            {% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <a href="{% url 'users:update_subjects' student.id %}">Update Subjects</a>
+                                    {% endif %}
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">No students found in this stream.</p>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+{% endblock %}
