@@ -232,10 +232,13 @@ def student_result(request, student_id, exam_id):
 
     return render(request, 'adminstrator/student_result.html', context)
 
+
+
 def update_subject_marks(request, student_id, exam_id):
     student = get_object_or_404(CustomUser, id=student_id)
     exam = get_object_or_404(Exam, id=exam_id)
     student_subjects = student.subjects.all()
+    print(student_subjects)
 
     if request.method == 'POST':
         form = SubjectMarksForm(request.POST, subjects=student_subjects)
@@ -249,11 +252,23 @@ def update_subject_marks(request, student_id, exam_id):
                     defaults={'marks': marks}
                 )
 
+            messages.success(request, "Subject marks updated successfully.")
             return redirect('users:student_result', student_id=student_id, exam_id=exam_id)
+        else:
+            # Display form errors as messages
+            for field_errors in form.errors.values():
+                for error in field_errors:
+                    messages.error(request, error)
     else:
         initial_data = {f'marks_{student_subject.id}': student_subject.marks
                         for student_subject in student_subjects}
         form = SubjectMarksForm(subjects=student_subjects, initial=initial_data)
+
+    # Add form errors to the form fields
+    for field in form:
+        if field.errors:
+            field_class = field.field.widget.attrs.get('class', '')
+            field.field.widget.attrs['class'] = f'{field_class} is-invalid'
 
     context = {
         'student': student,
@@ -263,3 +278,5 @@ def update_subject_marks(request, student_id, exam_id):
     }
 
     return render(request, 'adminstrator/update_subject_marks.html', context)
+
+

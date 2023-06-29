@@ -139,7 +139,7 @@ class StudentSubject(models.Model):
 class Result(models.Model):
     student_subject = models.ForeignKey(StudentSubject, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
-    marks = models.DecimalField(max_digits=5, decimal_places=2)
+    marks = models.DecimalField(max_digits=5, decimal_places=2,null=True, blank=True)
 
     def __str__(self):
         return f"{self.student_subject.student} - {self.student_subject.subject}: {self.marks}"

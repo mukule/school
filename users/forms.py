@@ -264,5 +264,7 @@ class SubjectMarksForm(forms.Form):
         subjects = kwargs.pop('subjects')
         super().__init__(*args, **kwargs)
         for student_subject in subjects:
-            self.fields[f'marks_{student_subject.id}'] = forms.DecimalField(label=student_subject.subject.name)
-
+            self.fields[f'marks_{student_subject.id}'] = forms.DecimalField(
+                label=student_subject.subject.name,
+                required=False  # Set required attribute to False
+            )
