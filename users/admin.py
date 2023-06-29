@@ -14,6 +14,7 @@ admin.site.register(Grade)
 admin.site.register(Result)
 
 
+
 class StreamInline(admin.TabularInline):
     model = Stream
 

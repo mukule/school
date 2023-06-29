@@ -13,7 +13,7 @@
         <th>Full Name</th>
         <th>Admission Number</th>
         <th>Entry Marks</th>
-        <th>Subject</th>
+        <th>perfomance</th>
       </tr>
     </thead>
     <tbody>
@@ -28,10 +28,7 @@
         <td>{{ student.username }}</td>
         <td>{{ student.entry_marks }}</td>
         <td>
-          {% for subject in student.subjects.all %}
-          {{ subject.name }}
-          {% if not forloop.last %}, {% endif %}
-          {% endfor %}
+         
         </td>
       </tr>
       {% endfor %}

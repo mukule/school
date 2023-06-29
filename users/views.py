@@ -207,30 +207,26 @@ def exam_result(request, exam_id, stream_id):
     # Retrieve all the students from the stream within the class
     students = stream.students.all()
 
+    # Retrieve the results for the given exam and students
+    results = Result.objects.filter(exam=exam, student_subject__student__in=students)
+  
+
+    # Create a dictionary to map student IDs to their corresponding results
+    student_results = {}
+    for result in results:
+        student_id = result.student_subject.student.id
+        if student_id not in student_results:
+            student_results[student_id] = []
+        student_results[student_id].append(result)
+        print(student_results)
+
     context = {
         'exam': exam,
         'students': students,
+        'student_results': student_results,
     }
 
     return render(request, 'adminstrator/exam_result.html', context)
-
-def student_result(request, student_id, exam_id):
-    student = get_object_or_404(CustomUser, id=student_id)
-    exam = get_object_or_404(Exam, id=exam_id)
-    print(exam)
-    print(student)
-
-    # Retrieve the subject marks for the given student and exam
-    subject_ids = exam.classes.values_list('subjects__id', flat=True)
-    subjects = StudentSubject.objects.filter(student=student, subject__in=subject_ids)
-
-    context = {
-        'student': student,
-        'exam': exam,
-        'subjects': subjects,
-    }
-
-    return render(request, 'adminstrator/student_result.html', context)
 
 
 
@@ -238,7 +234,6 @@ def update_subject_marks(request, student_id, exam_id):
     student = get_object_or_404(CustomUser, id=student_id)
     exam = get_object_or_404(Exam, id=exam_id)
     student_subjects = student.subjects.all()
-    print(student_subjects)
 
     if request.method == 'POST':
         form = SubjectMarksForm(request.POST, subjects=student_subjects)
@@ -260,8 +255,15 @@ def update_subject_marks(request, student_id, exam_id):
                 for error in field_errors:
                     messages.error(request, error)
     else:
-        initial_data = {f'marks_{student_subject.id}': student_subject.marks
-                        for student_subject in student_subjects}
+        initial_data = {}
+        for student_subject in student_subjects:
+            result = Result.objects.filter(
+                student_subject=student_subject,
+                exam=exam
+            ).first()
+            marks = result.marks if result else Decimal('0.00')
+            initial_data[f'marks_{student_subject.id}'] = marks
+
         form = SubjectMarksForm(subjects=student_subjects, initial=initial_data)
 
     # Add form errors to the form fields
@@ -279,4 +281,31 @@ def update_subject_marks(request, student_id, exam_id):
 
     return render(request, 'adminstrator/update_subject_marks.html', context)
 
+def update_result(request, student_subject_id, exam_id):
+    student_subject = get_object_or_404(StudentSubject, id=student_subject_id)
+    exam = get_object_or_404(Exam, id=exam_id)
+
+    if request.method == 'POST':
+        form = ResultForm(request.POST)
+        if form.is_valid():
+            marks = form.cleaned_data['marks']
+            Result.objects.update_or_create(
+                student_subject=student_subject,
+                exam=exam,
+                defaults={'marks': marks}
+            )
+            messages.success(request, "Result updated successfully.")
+            return redirect('users:student_result', student_id=student_subject.student.id, exam_id=exam_id)
+    else:
+        initial_data = {'marks': student_subject.result.marks if student_subject.result else Decimal('0.00')}
+        print(initial_data)
+        form = ResultForm(initial=initial_data)
+
+    context = {
+        'student_subject': student_subject,
+        'exam': exam,
+        'form': form,
+    }
+
+    return render(request, 'adminstrator/update_result.html', context)
 

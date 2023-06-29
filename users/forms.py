@@ -262,9 +262,15 @@ class ExamForm(forms.ModelForm):
 class SubjectMarksForm(forms.Form):
     def __init__(self, *args, **kwargs):
         subjects = kwargs.pop('subjects')
+        initial_data = kwargs.pop('initial', {})
         super().__init__(*args, **kwargs)
         for student_subject in subjects:
-            self.fields[f'marks_{student_subject.id}'] = forms.DecimalField(
+            field_name = f'marks_{student_subject.id}'
+            self.fields[field_name] = forms.DecimalField(
                 label=student_subject.subject.name,
                 required=False  # Set required attribute to False
             )
+            self.initial[field_name] = initial_data.get(field_name, 0.00)
+
+class ResultForm(forms.Form):
+    marks = forms.DecimalField(max_digits=5, decimal_places=2)
