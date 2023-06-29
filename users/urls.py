@@ -23,6 +23,7 @@ urlpatterns = [
     path('exams/', views.exams, name='exams'),
     path('exam/<int:exam_id>/stream/<int:stream_id>/result/', views.exam_result, name='exam_result'),
     path('student/<int:student_id>/exam/<int:exam_id>/result/', views.update_subject_marks, name='student_result'),
+    path('student/<int:student_id>/exam/<int:exam_id>/view_result/', views.view_student_results, name='view_student_results'),
     
      
     # Other URL patterns

@@ -13,7 +13,6 @@ from django.http import JsonResponse
 from django.db.models import Count
 
 
-
 def get_filtered_streams(request):
     class_id = request.GET.get('class_id')
     streams = Stream.objects.filter(class_name_id=class_id).values('id', 'name')
@@ -153,35 +152,60 @@ def stream_detail(request, stream_id):
 
 from django.contrib import messages
 
-def update_subjects(request, user_id):
-    updated_user = get_object_or_404(CustomUser, id=user_id)
-    subjects = Subject.objects.all()
-    initial_subjects = updated_user.subjects.all()
+def update_subjects(request, student_id, exam_id):
+    student = get_object_or_404(CustomUser, id=student_id)
+    exam = get_object_or_404(Exam, id=exam_id)
+    student_subjects = student.subjects.all()
 
     if request.method == 'POST':
-        form = SubjectSelectionForm(request.POST, subjects=subjects)
+        form = SubjectMarksForm(request.POST, subjects=student_subjects)
 
         if form.is_valid():
-            selected_subjects = form.cleaned_data['subjects']
+            for student_subject in student_subjects:
+                marks = form.cleaned_data[f'marks_{student_subject.id}']
+                grade = calculate_grade(marks)  # Calculate the grade based on marks
 
-            # Delete existing StudentSubject objects for the user
-            updated_user.subjects.all().delete()
+                result, _ = Result.objects.update_or_create(
+                    student_subject=student_subject,
+                    exam=exam,
+                    defaults={'marks': marks, 'grade': grade}
+                )
 
-            # Create new StudentSubject objects for the selected subjects and user
-            for subject in selected_subjects:
-                StudentSubject.objects.create(student=updated_user, subject=subject, marks=0.0)
-
-            messages.success(request, "Subjects updated successfully.")
-            return redirect('users:stream_detail', stream_id=updated_user.stream.id)
+            messages.success(request, "Subject marks updated successfully.")
+            return redirect('users:student_result', student_id=student_id, exam_id=exam_id)
+        else:
+            # Display form errors as messages
+            for field_errors in form.errors.values():
+                for error in field_errors:
+                    messages.error(request, error)
     else:
-        form = SubjectSelectionForm(subjects=subjects, initial={'subjects': initial_subjects})
+        initial_data = {}
+        for student_subject in student_subjects:
+            result = Result.objects.filter(
+                student_subject=student_subject,
+                exam=exam
+            ).first()
+            marks = result.marks if result else Decimal('0.00')
+            initial_data[f'marks_{student_subject.id}'] = marks
+
+        form = SubjectMarksForm(subjects=student_subjects, initial=initial_data)
+
+    # Add form errors to the form fields
+    for field in form:
+        if field.errors:
+            field_class = field.field.widget.attrs.get('class', '')
+            field.field.widget.attrs['class'] = f'{field_class} is-invalid'
 
     context = {
-        'user': updated_user,
-        'form': form
+        'student': student,
+        'exam': exam,
+        'subjects': student_subjects,
+        'form': form,
     }
 
-    return render(request, 'adminstrator/update_subjects.html', context)
+    return render(request, 'adminstrator/update_subject_marks.html', context)
+
+
 
 def create_exam(request):
     if request.method == 'POST':
@@ -228,8 +252,6 @@ def exam_result(request, exam_id, stream_id):
 
     return render(request, 'adminstrator/exam_result.html', context)
 
-
-
 def update_subject_marks(request, student_id, exam_id):
     student = get_object_or_404(CustomUser, id=student_id)
     exam = get_object_or_404(Exam, id=exam_id)
@@ -241,7 +263,7 @@ def update_subject_marks(request, student_id, exam_id):
         if form.is_valid():
             for student_subject in student_subjects:
                 marks = form.cleaned_data[f'marks_{student_subject.id}']
-                Result.objects.update_or_create(
+                result, _ = Result.objects.update_or_create(
                     student_subject=student_subject,
                     exam=exam,
                     defaults={'marks': marks}
@@ -281,31 +303,51 @@ def update_subject_marks(request, student_id, exam_id):
 
     return render(request, 'adminstrator/update_subject_marks.html', context)
 
-def update_result(request, student_subject_id, exam_id):
-    student_subject = get_object_or_404(StudentSubject, id=student_subject_id)
-    exam = get_object_or_404(Exam, id=exam_id)
-
-    if request.method == 'POST':
-        form = ResultForm(request.POST)
-        if form.is_valid():
-            marks = form.cleaned_data['marks']
-            Result.objects.update_or_create(
-                student_subject=student_subject,
-                exam=exam,
-                defaults={'marks': marks}
-            )
-            messages.success(request, "Result updated successfully.")
-            return redirect('users:student_result', student_id=student_subject.student.id, exam_id=exam_id)
+def calculate_grade(marks):
+    if marks >= 80:
+        return 'A'
+    elif marks >= 75:
+        return 'A-'
+    elif marks >= 70:
+        return 'B+'
+    elif marks >= 65:
+        return 'B'
+    elif marks >= 60:
+        return 'B-'
+    elif marks >= 55:
+        return 'C+'
+    elif marks >= 50:
+        return 'C'
+    elif marks >= 45:
+        return 'C-'
+    elif marks >= 40:
+        return 'D+'
+    elif marks >= 35:
+        return 'D'
+    elif marks >= 30:
+        return 'D-'
     else:
-        initial_data = {'marks': student_subject.result.marks if student_subject.result else Decimal('0.00')}
-        print(initial_data)
-        form = ResultForm(initial=initial_data)
+        return 'E'
+
+
+
+
+
+def view_student_results(request, student_id, exam_id):
+    student = get_object_or_404(CustomUser, id=student_id, user_type='student')
+    exam = get_object_or_404(Exam, id=exam_id)
+    print(student_id, exam_id)
+    # Retrieve the results for the student and exam
+    results = Result.objects.filter(student_subject__student=student, exam=exam)
+
+    print(results)  # Debug message to check if results are being retrieved
 
     context = {
-        'student_subject': student_subject,
+        'student': student,
         'exam': exam,
-        'form': form,
+        'results': results,
     }
 
-    return render(request, 'adminstrator/update_result.html', context)
+    return render(request, 'adminstrator/student_result.html', context)
+
 

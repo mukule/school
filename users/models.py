@@ -136,19 +136,43 @@ class StudentSubject(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.subject}: {self.marks}"
-
-
+    
 class Result(models.Model):
     student_subject = models.ForeignKey(StudentSubject, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     marks = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=Decimal('0.00'))
+    grade = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return f"{self.student_subject.student} - {self.student_subject.subject}: {self.marks}"
 
-class Grade(models.Model):
-    grade_name = models.CharField(max_length=10)
-    grade_points = models.DecimalField(max_digits=5, decimal_places=2)
+    def calculate_grade(self):
+        marks = self.marks
+        if marks >= 80:
+            return 'A'
+        elif marks >= 75:
+            return 'A-'
+        elif marks >= 70:
+            return 'B+'
+        elif marks >= 65:
+            return 'B'
+        elif marks >= 60:
+            return 'B-'
+        elif marks >= 55:
+            return 'C+'
+        elif marks >= 50:
+            return 'C'
+        elif marks >= 45:
+            return 'C-'
+        elif marks >= 40:
+            return 'D+'
+        elif marks >= 35:
+            return 'D'
+        elif marks >= 30:
+            return 'D-'
+        else:
+            return 'E'
 
-    def __str__(self):
-        return self.grade_name
+    def save(self, *args, **kwargs):
+        self.grade = self.calculate_grade()
+        super().save(*args, **kwargs)

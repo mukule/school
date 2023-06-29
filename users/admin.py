@@ -10,7 +10,6 @@ admin.site.register(House)
 admin.site.register(Subject)
 admin.site.register(Exam)
 admin.site.register(StudentSubject)
-admin.site.register(Grade)
 admin.site.register(Result)
 
 

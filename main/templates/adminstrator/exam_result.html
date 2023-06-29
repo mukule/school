@@ -13,22 +13,27 @@
         <th>Full Name</th>
         <th>Admission Number</th>
         <th>Entry Marks</th>
-        <th>perfomance</th>
+        <th>Action</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
       {% for student in students %}
       <tr>
         <td>
-            <a href="{% url 'users:student_result' student.id exam.id %}">
               {{ student.get_full_name }}
-            </a>
           </td>
           
         <td>{{ student.username }}</td>
         <td>{{ student.entry_marks }}</td>
         <td>
-         
+         <a href="{% url 'users:student_result' student.id exam.id %}
+         ">Update Student Result</a>
+        </td>
+        <td>
+            <a href="{% url 'users:view_student_results' student.id exam.id %}">
+                View Student Results
+              </a>
         </td>
       </tr>
       {% endfor %}
