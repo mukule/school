@@ -150,7 +150,35 @@ def stream_detail(request, stream_id):
     return render(request, 'adminstrator/stream_detail.html', context)
 
 
-from django.contrib import messages
+
+def subject_selection_view(request, student_id):
+    student = get_object_or_404(CustomUser, id=student_id)
+
+    if request.method == 'POST':
+        form = SubjectSelectionForm(request.POST, subjects=Subject.objects.all())
+        if form.is_valid():
+            selected_subjects = form.cleaned_data['subjects']
+
+            for subject in selected_subjects:
+                student_subject, created = StudentSubject.objects.get_or_create(student=student, subject=subject)
+                student_subject.marks = 0.0
+                student_subject.save()
+
+            stream_id = student.stream.id  # Get the stream_id from the student object
+
+            # Add success message
+            messages.success(request, f"Subjects selected successfully for {student.get_full_name()}")
+
+            return redirect('users:stream_detail', stream_id=stream_id)
+    else:
+        form = SubjectSelectionForm(subjects=Subject.objects.all())
+
+    context = {
+        'form': form,
+        'student': student
+    }
+
+    return render(request, 'adminstrator/subject_selection.html', context)
 
 def update_subjects(request, student_id, exam_id):
     student = get_object_or_404(CustomUser, id=student_id)

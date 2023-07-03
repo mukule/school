@@ -132,7 +132,7 @@ class Leadership(models.Model):
 class StudentSubject(models.Model):
     student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='subjects')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    marks = models.DecimalField(max_digits=5, decimal_places=2)
+    marks = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
 
     def __str__(self):
         return f"{self.student} - {self.subject}: {self.marks}"

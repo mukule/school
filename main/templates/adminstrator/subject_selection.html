@@ -7,7 +7,7 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-6">
-        <h4 class="text-center">Update Subjects for {{ user.first_name }} {{ user.last_name }}</h4>
+        <h4 class="text-center">Update Subjects for {{ student.first_name }} {{ student.last_name }}</h4>
         <form method="post">
           {% csrf_token %}
           {{ form.subjects }}

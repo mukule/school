@@ -72,7 +72,7 @@
                                             {% if not forloop.last %}, {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <a href="{% url 'users:update_subjects' student.id %}">Update Subjects</a>
+                                        <a href="{% url 'users:subject_selection' student.id %}">Update Subjects</a>
                                     {% endif %}
                                 </td>
                                 
