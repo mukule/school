@@ -15,6 +15,8 @@
         <tr>
           <th>Subject</th>
           <th>Marks</th>
+          <th>Points</th>
+          <th>Grade</th>
         </tr>
       </thead>
       <tbody>
@@ -22,9 +24,22 @@
         <tr>
           <td>{{ result.student_subject.subject.name }}</td>
           <td>{{ result.marks }}</td>
+          <td>{{ result.points }}</td>
+          <td>{{ result.grade }}</td>
         </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="4">Total Points: {{ results.0.total_points }}</th>
+        </tr>
+        <tr>
+          <th colspan="4">Mean Grade: {{ results.0.mean_grade }}</th>
+        </tr>
+        <tr>
+          <th colspan="4">Class Teacher's Comment: {{ results.0.teacher_comments }}</th>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>
