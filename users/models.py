@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 from decimal import Decimal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.db.models import Sum
 
 
 class Subject(models.Model):
@@ -142,37 +144,121 @@ class Result(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     marks = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=Decimal('0.00'))
     grade = models.CharField(max_length=10, null=True, blank=True)
+    points = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    total_points = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    mean_grade = models.CharField(max_length=10, null=True, blank=True)
+    teacher_comments = models.TextField(blank=True)  # Add the field for teacher comments
 
     def __str__(self):
-        return f"{self.student_subject.student} - {self.student_subject.subject}: {self.marks}"
+        return f"{self.student_subject.student} - {self.student_subject.subject}: {self.marks} ({self.exam})"
 
-    def calculate_grade(self):
-        marks = self.marks
-        if marks >= 80:
-            return 'A'
-        elif marks >= 75:
-            return 'A-'
-        elif marks >= 70:
-            return 'B+'
-        elif marks >= 65:
-            return 'B'
-        elif marks >= 60:
-            return 'B-'
-        elif marks >= 55:
-            return 'C+'
-        elif marks >= 50:
-            return 'C'
-        elif marks >= 45:
-            return 'C-'
-        elif marks >= 40:
-            return 'D+'
-        elif marks >= 35:
-            return 'D'
-        elif marks >= 30:
-            return 'D-'
-        else:
-            return 'E'
 
-    def save(self, *args, **kwargs):
-        self.grade = self.calculate_grade()
-        super().save(*args, **kwargs)
+
+@receiver(post_save, sender=Result)
+def update_result_grade_and_points(sender, instance, **kwargs):
+    marks = instance.marks
+    instance.grade = calculate_grade(marks)
+    instance.points = calculate_points(instance.grade)
+    instance.total_points = calculate_total_points(instance.student_subject.student, instance.exam)
+    instance.mean_grade = calculate_mean_grade(instance.total_points)
+    Result.objects.filter(pk=instance.pk).update(
+        grade=instance.grade,
+        points=instance.points,
+        total_points=instance.total_points,
+        mean_grade=instance.mean_grade
+    )
+
+
+def calculate_grade(marks):
+    if marks >= 80:
+        return 'A'
+    elif marks >= 75:
+        return 'A-'
+    elif marks >= 70:
+        return 'B+'
+    elif marks >= 65:
+        return 'B'
+    elif marks >= 60:
+        return 'B-'
+    elif marks >= 55:
+        return 'C+'
+    elif marks >= 50:
+        return 'C'
+    elif marks >= 45:
+        return 'C-'
+    elif marks >= 40:
+        return 'D+'
+    elif marks >= 35:
+        return 'D'
+    elif marks >= 30:
+        return 'D-'
+    else:
+        return 'E'
+
+
+def calculate_points(grade):
+    if grade == 'A':
+        return 12
+    elif grade == 'A-':
+        return 11
+    elif grade == 'B+':
+        return 10
+    elif grade == 'B':
+        return 9
+    elif grade == 'B-':
+        return 8
+    elif grade == 'C+':
+        return 7
+    elif grade == 'C':
+        return 6
+    elif grade == 'C-':
+        return 5
+    elif grade == 'D+':
+        return 4
+    elif grade == 'D':
+        return 3
+    elif grade == 'D-':
+        return 2
+    elif grade == 'E':
+        return 1
+    else:
+        return 0
+
+
+def calculate_total_points(student, exam):
+    # Calculate the total points for a student in all subjects within an exam
+    result_qs = Result.objects.filter(student_subject__student=student, exam=exam)
+    total_points = Decimal('0.00')
+    
+    for result in result_qs:
+        total_points += result.points
+    
+    return total_points
+
+
+def calculate_mean_grade(total_points):
+    # Calculate the mean grade based on the total points
+    if total_points >= 80:
+        return 'A'
+    elif total_points >= 75:
+        return 'A-'
+    elif total_points >= 70:
+        return 'B+'
+    elif total_points >= 65:
+        return 'B'
+    elif total_points >= 60:
+        return 'B-'
+    elif total_points >= 55:
+        return 'C+'
+    elif total_points >= 50:
+        return 'C'
+    elif total_points >= 45:
+        return 'C-'
+    elif total_points >= 40:
+        return 'D+'
+    elif total_points >= 35:
+        return 'D'
+    elif total_points >= 30:
+        return 'D-'
+    else:
+        return 'E'

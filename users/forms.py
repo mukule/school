@@ -263,14 +263,27 @@ class SubjectMarksForm(forms.Form):
     def __init__(self, *args, **kwargs):
         subjects = kwargs.pop('subjects')
         initial_data = kwargs.pop('initial', {})
+        comment_initial = initial_data.pop('comment', 'No comment')  # Get the initial comment value
         super().__init__(*args, **kwargs)
         for student_subject in subjects:
-            field_name = f'marks_{student_subject.id}'
-            self.fields[field_name] = forms.DecimalField(
+            marks_field_name = f'marks_{student_subject.id}'
+            self.fields[marks_field_name] = forms.DecimalField(
                 label=student_subject.subject.name,
-                required=False  # Set required attribute to False
+                required=False
             )
-            self.initial[field_name] = initial_data.get(field_name, 0.00)
+            self.initial[marks_field_name] = initial_data.get(marks_field_name, 0.00)
+        
+        self.fields['comment'] = forms.CharField(
+            label='Teacher Comments',
+            required=False,
+            widget=forms.Textarea(attrs={'rows': 3}),
+            initial=comment_initial  # Set the initial comment value
+        )
+
+
+
+
+
 
 class ResultForm(forms.Form):
     marks = forms.DecimalField(max_digits=5, decimal_places=2)

@@ -18,7 +18,7 @@ def get_filtered_streams(request):
     streams = Stream.objects.filter(class_name_id=class_id).values('id', 'name')
     return JsonResponse({'streams': list(streams)})
 
-@user_passes_test(lambda u: u.is_authenticated and u.user_type == 'admin', login_url='users:login')
+# @user_passes_test(lambda u: u.is_authenticated and u.user_type == 'admin', login_url='users:login')
 def register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
@@ -191,12 +191,11 @@ def update_subjects(request, student_id, exam_id):
         if form.is_valid():
             for student_subject in student_subjects:
                 marks = form.cleaned_data[f'marks_{student_subject.id}']
-                grade = calculate_grade(marks)  # Calculate the grade based on marks
-
+                
                 result, _ = Result.objects.update_or_create(
                     student_subject=student_subject,
                     exam=exam,
-                    defaults={'marks': marks, 'grade': grade}
+                    defaults={'marks': marks}
                 )
 
             messages.success(request, "Subject marks updated successfully.")
@@ -289,15 +288,27 @@ def update_subject_marks(request, student_id, exam_id):
         form = SubjectMarksForm(request.POST, subjects=student_subjects)
 
         if form.is_valid():
+            marks_data = {}
             for student_subject in student_subjects:
                 marks = form.cleaned_data[f'marks_{student_subject.id}']
+                marks_data[student_subject.id] = marks
+
+            comment = form.cleaned_data['comment']
+
+            for student_subject in student_subjects:
+                marks = marks_data[student_subject.id]
                 result, _ = Result.objects.update_or_create(
                     student_subject=student_subject,
                     exam=exam,
                     defaults={'marks': marks}
                 )
 
-            messages.success(request, "Subject marks updated successfully.")
+            # Update the teacher comment for all subjects
+            Result.objects.filter(student_subject__in=student_subjects, exam=exam).update(
+                teacher_comments=comment
+            )
+
+            messages.success(request, "Subject marks and comment updated successfully.")
             return redirect('users:student_result', student_id=student_id, exam_id=exam_id)
         else:
             # Display form errors as messages
@@ -313,6 +324,11 @@ def update_subject_marks(request, student_id, exam_id):
             ).first()
             marks = result.marks if result else Decimal('0.00')
             initial_data[f'marks_{student_subject.id}'] = marks
+
+        # Get the existing teacher comment
+        comment = Result.objects.filter(student_subject__in=student_subjects, exam=exam).first()
+        comment_initial = comment.teacher_comments if comment else 'No comment'
+        initial_data['comment'] = comment_initial
 
         form = SubjectMarksForm(subjects=student_subjects, initial=initial_data)
 
@@ -331,35 +347,6 @@ def update_subject_marks(request, student_id, exam_id):
 
     return render(request, 'adminstrator/update_subject_marks.html', context)
 
-def calculate_grade(marks):
-    if marks >= 80:
-        return 'A'
-    elif marks >= 75:
-        return 'A-'
-    elif marks >= 70:
-        return 'B+'
-    elif marks >= 65:
-        return 'B'
-    elif marks >= 60:
-        return 'B-'
-    elif marks >= 55:
-        return 'C+'
-    elif marks >= 50:
-        return 'C'
-    elif marks >= 45:
-        return 'C-'
-    elif marks >= 40:
-        return 'D+'
-    elif marks >= 35:
-        return 'D'
-    elif marks >= 30:
-        return 'D-'
-    else:
-        return 'E'
-
-
-
-
 
 def view_student_results(request, student_id, exam_id):
     student = get_object_or_404(CustomUser, id=student_id, user_type='student')
@@ -368,8 +355,8 @@ def view_student_results(request, student_id, exam_id):
     # Retrieve the results for the student and exam
     results = Result.objects.filter(student_subject__student=student, exam=exam)
 
-    print(results)  # Debug message to check if results are being retrieved
-
+    # Debug statement to print mean grade
+   
     context = {
         'student': student,
         'exam': exam,
@@ -377,5 +364,3 @@ def view_student_results(request, student_id, exam_id):
     }
 
     return render(request, 'adminstrator/student_result.html', context)
-
-
