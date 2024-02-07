@@ -1,28 +1,50 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en" class="light"></html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="{% static 'main/images/icon.ico' %}">
   <title>Kwanthanze - student Portal</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+  <link rel="shortcut icon" href="{% static 'main/images/logo2.png' %}" type="image/jpg">
+	<!--plugins-->
+  <link rel="stylesheet" href="{% static 'main/plugins/vectormap/jquery-jvectormap-2.0.2.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/plugins/simplebar/css/simplebar.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/plugins/perfect-scrollbar/css/perfect-scrollbar.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/plugins/metismenu/css/metisMenu.min.css' %}" rel="stylesheet">
+
+    
+	<!-- loader-->
+    <link rel="stylesheet" href="{% static 'main/css/pace.min.css' %}" rel="stylesheet">
+	<script src="{% static 'main/css/pace.min.js' %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static 'main/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'main/css/bootstrap-extended.css' %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="{% static 'main/css/app.css' %}" rel="stylesheet">
+    <link href="{% static 'main/css/icons.css' %}" rel="stylesheet">
+
+    <!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static 'main/css/dark-theme.css' %}" />
+	<link rel="stylesheet" href="{% static 'main/css/semi-dark.css' %}" />
+	<link rel="stylesheet" href="{% static 'main/css/header-colors.css' %}" />
 </head>
 <body>
+  <div class="wrapper">
     {% include 'adminstrator/includes/navbar.html' %}
-    <div class="container">
-    {% include '../main/includes/messaging.html' %}
     
+    {% include '../main/includes/messaging.html' %}
     {% block content %}
     {% endblock %}
     </div>
-  
-   
-    <script src="{% static 'main/js/ajax.js.js' %}"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  
+    <script src="{% static 'main/js/bootstrap.bundle.min.js' %}"></script>
+    <!--plugins-->
+      <script src="{% static 'main/js/jquery.min.js' %}"></script>
+      <script src="{% static 'main/plugins/simplebar/js/simplebar.min.js' %}"></script>
+      <script src="{% static 'main/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+      <script src="{% static 'main/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+      <script src="{% static 'main/js/index.js' %}"></script>
+      <script src="{% static 'main/js/app.js' %}"></script>
+      
 </body>
 </html>
